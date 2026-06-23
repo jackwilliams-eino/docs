@@ -1,0 +1,62 @@
+---
+title: "Changelog"
+description: "Product updates and new features"
+rss: true
+---
+
+{/* Add each release as an <Update> block below, newest first. */}
+{/* The label is the release date. Replace every TODO-LINK with a real KB URL before merging. */}
+
+<Update label="2026-06-22">
+
+> DAS AI placement, WiFi manual channels, fade margin, riser diagram editor, and custom MCS tables ship alongside fixes for walk-test rendering, report wiring visibility, and cellular config round-tripping.
+
+## New
+
+### DAS AI placement: keep existing head end and RU locations
+Re-run "Place AP with AI" on a DAS design without losing committed head end or RU positions.
+How to use it → TODO-LINK
+
+### Manual WiFi channel assignment per AP
+Pin any AP band to a specific WiFi channel instead of letting auto-allocation decide.
+How to use it → TODO-LINK
+
+### Fade Margin control in ray tracing settings
+Apply a global link-budget margin (dB) to heatmaps without changing per-AP transmit power.
+How to use it → TODO-LINK
+
+### Riser diagram editor
+The riser diagram editor is now available for all projects.
+How to use it → TODO-LINK
+
+### Custom MCS mapping per AP device type
+Upload a custom RSRP/RSSI/SINR-to-MCS/CQI table that applies across a project.
+How to use it → TODO-LINK
+
+### DAS antennas auto-connect on placement
+Placing a DAS antenna now automatically cables it to the nearest free upstream port.
+How to use it → TODO-LINK
+
+## Improved
+
+- [DAS AI placement]: DAS carrier channel width is now selectable from the band's allowed widths instead of being fixed at 20 MHz.
+- [DAS — Everon 6200]: Digital distributor now displays as "Switch" and port counts are editable on placed instances.
+- [Walk-test]: PCI is now a first-class heatmap KPI with categorical dominance rendering and a per-KPI sample table with CSV export.
+- [Walk-test]: Switching to "Site survey data" no longer forces an upload prompt when survey data already exists for the layout.
+- [AP/RU placement defaults]: Mounting type and height now pre-fill based on project IO type and layout ceiling height.
+- [Riser diagram]: EIRP is now shown on the riser diagram for WiFi and LoRa, not only DAS.
+- [DAS radiated power]: Active DAS antennas now simulate at RU power rather than headend power.
+- [Vector PDF wall parsing]: Multi-floor digital-twin wall parsing is significantly faster on dense CAD exports.
+- [Multi-floor projects]: Project load time is reduced on layouts with large wall counts across multiple floors.
+
+## Fixed
+
+- Fixed DAS cabling visibility toggle having no effect on generated report heatmaps.
+- Fixed cellular AP config Mounting, Height, and Pin-to-story edits being lost on save.
+- Fixed geolocation wizard "Next" button submitting before the map had finished loading.
+- Fixed walk-test PCI and EARFCN heatmap selection crashing and showing a black canvas.
+- Fixed project settings channel selectors rendering oversized for CBRS and C-Band rows.
+- Fixed walk-test site-survey heatmap remaining visible after switching to the eino walk-test view.
+- Fixed RSSI missing from the walk-test KPI resolver.
+
+</Update>
