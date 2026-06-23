@@ -8,13 +8,6 @@
   "navigation": {
     "groups": [
       {
-        "group": "Design Networks",
-        "pages": [
-          "design-networks/network-design-overview",
-          "design-networks/network-templates"
-        ]
-      },
-      {
         "group": "Changelog",
         "pages": [
           "changelog"
