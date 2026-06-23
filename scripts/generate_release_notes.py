@@ -240,6 +240,8 @@ def main():
 
     # 3. Draft
     digest = build_pr_digest(features)
+    if len(digest.strip()) < 20:
+    sys.exit("PR digest is too short to be meaningful — check that the repos and date window are correct.")
     body = draft_release_note(prompt_text, digest, args.model)
 
     # 4. Wrap in a Mintlify <Update> block (script owns the date, model owns the content)
