@@ -1,0 +1,59 @@
+name: Generate Release Notes
+
+# Lets anyone with repo access generate a release note from the GitHub UI:
+# Actions tab -> "Generate Release Notes" -> Run workflow -> (optionally) enter dates.
+# It runs the script, inserts the entry into changelog.mdx, and opens a PR to review.
+
+on:
+  workflow_dispatch:
+    inputs:
+      since:
+        description: "Start date YYYY-MM-DD (leave blank to auto-detect the latest release window)"
+        required: false
+      until:
+        description: "End date YYYY-MM-DD (leave blank for the detected release date / today)"
+        required: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out docs repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install anthropic requests
+
+      - name: Generate release note and insert into changelog
+        env:
+          # GH_PAT must have read access to the source repos and write access to this docs repo.
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          ARGS=""
+          if [ -n "${{ inputs.since }}" ]; then ARGS="$ARGS --since ${{ inputs.since }}"; fi
+          if [ -n "${{ inputs.until }}" ]; then ARGS="$ARGS --until ${{ inputs.until }}"; fi
+          python scripts/generate_release_notes.py $ARGS --changelog changelog.mdx
+
+      - name: Open a pull request with the draft
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GH_PAT }}
+          branch: release-notes/run-${{ github.run_id }}
+          title: "Release notes draft"
+          commit-message: "Add release notes draft"
+          add-paths: changelog.mdx
+          body: |
+            Auto-generated release notes draft.
+
+            Before merging:
+            - Review each entry in `changelog.mdx`
+            - Resolve any `{/* REVIEW */}` flags
+            - Replace every `TODO-LINK` with the real KB article URL
+
+            Merging publishes the changelog via Mintlify.
