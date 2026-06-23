@@ -9,6 +9,79 @@ rss: true
 
 <Update label="2026-06-22">
 
+# Release Notes — eino · [YYYY-MM-DD]
+
+> This release brings major DAS AI improvements, manual WiFi channel assignment, walk-test upgrades including PCI heatmaps and CSV export, custom MCS/CQI mapping, and a range of fixes across reporting, channel planning, and cellular configs.
+
+## New
+
+### DAS "Place AP with AI" — keep existing Head End and Remote Unit locations
+When re-running AI placement on a DAS design, you can now choose to keep your existing Head End and/or Remote Unit positions. The AI re-plans only the passive network (antennas, splitters, cabling) around your anchored infrastructure — so a committed physical installation no longer gets wiped on every run. If the re-planned antenna coverage needs more RUs than the kept units can support, new RUs are added for the overflow while existing positions stay locked.
+How to use it → TODO-LINK
+
+### DAS — band-aware channel width selection
+The DAS "Place AP with AI" modal now shows the allowed channel widths for the selected band (instead of always using 20 MHz). Pick the width that matches your deployment; the field defaults to the band's standard width.
+How to use it → TODO-LINK
+
+### Manual WiFi channel assignment per AP
+You can now pin a specific channel to any WiFi AP band instead of letting the AI assign it automatically. A per-band toggle enables manual mode; a searchable dropdown (filtered by project channel config, band, and channel width) lets you pick the exact channel. Manually assigned channels are preserved across re-plans and appear in heatmaps and reports.
+How to use it → TODO-LINK
+
+### Walk-test: PCI as a heatmap KPI
+PCI (Physical Cell ID) is now a first-class walk-test heatmap option. Because PCI is categorical rather than scalar, it renders as a Voronoi-style dominance map — each area shows the cell that wins there — with crisp colour boundaries and a matching hover tooltip.
+How to use it → TODO-LINK
+
+### Walk-test: per-KPI sample table and CSV export
+The walk-test right panel now shows a full sample table for the selected KPI. You can export the raw samples as a CSV directly from the panel.
+How to use it → TODO-LINK
+
+### Walk-test: KPI selector in the shared heatmap dropdown
+The walk-test KPI selector has moved into the shared heatmap band/KPI dropdown, keeping the UI consistent with other heatmap modes.
+How to use it → TODO-LINK <!-- REVIEW: split from #699 umbrella PR — confirm these are three distinct enough features to list separately, or collapse into one "Walk-test improvements" block -->
+
+### Custom MCS/CQI mapping per AP device type
+You can now upload a custom MCS/CQI-to-throughput table for an AP device type and have it apply across your project. A chart previews the mapping, throughput is optional, and the mapping auto-saves on upload. You can reset to the default at any time.
+How to use it → TODO-LINK
+
+### Peplink cellular site survey query
+Detailed cellular site survey telemetry from Peplink devices (via IC2 cloud) is now available as a query: per-cell band, channel, bandwidth, PCI, RSRP/RSRQ, carrier, and agent-derived band-lock labels.
+How to use it → TODO-LINK <!-- REVIEW: confirm this is user-facing / accessible in the UI, or if it is API/backend-only at this stage -->
+
+### DAS antenna auto-connect on placement
+When you place a new DAS antenna, it now automatically connects to the nearest free upstream port on the same layout — selecting a compatible cable type and updating signal-source/port mappings. No manual cabling step required. Auto-connect can be turned off if you prefer to wire manually.
+How to use it → TODO-LINK
+
+### Own-device (Peplink) walk-tests preserved on project copy
+Completed Peplink walk-test sessions are now snapshotted as survey data rows (one per band), so they survive project duplication, render in validation views, and behave identically to uploaded third-party surveys.
+How to use it → TODO-LINK
+
+## Improved
+
+- **DAS — Everon 6200**: The AI now routes through the Everon 6200's own switch (`Headend → Switch → RU`) and supports up to 100 MHz carriers on n41/n90 bands, matching vendor topology and bandwidth capabilities.
+- **DAS — Everon 6200**: Digital distributor components now display as "Switch" in the component picker (instead of "Power Splitter") when on a digital/optical-digital signal path, so the label matches the physical equipment.
+- **DAS — Everon 6200**: Port counts on placed Remote Units, Signal Sources, and Distribution Elements (switches and splitters) are now editable directly on the instance.
+- **DAS radiated power accuracy**: Active DAS antennas now correctly source transmit power from their Remote Unit rather than the headend, aligning the EIRP panel and all RF simulation paths (ray tracing, heatmaps, point-to-point).
+- **DAS transmit power field**: Renamed from "Transmit power" to "Antenna Power" in the DAS carrier settings for clarity.
+- **AP/RU placement defaults**: When adding an AP or RU, the pre-filled mounting type and height now reflect both the hardware's typical installation (from the device catalog) and the actual project/layout context — outdoor projects default to Pole at 9.1 m; indoor layouts use the floor's ceiling height to set ceiling/wall/pole heights automatically.
+- **Walk-test site survey mode**: Switching to "Site survey data" in the source selector no longer always opens the upload modal — if survey data already exists for the layout, it goes straight to the view.
+- **Heatmap performance**: Antenna pattern gain grids are now stored ~9× more compactly (int8 encoding, ≤ 0.2 dB round-trip error), reducing storage and improving load times for large catalogs. <!-- REVIEW: users may not notice this directly; consider whether it's worth surfacing or dropping -->
+
+## Fixed
+
+- Fixed report heatmaps always showing DAS cabling regardless of the "Wiring" visibility toggle — the toggle now controls cabling in generated reports and exports (Large Format, A4/Letter, GeoTIFF/KMZ) as well as the live canvas. Note: wiring is hidden by default.
+- Fixed the geo-anchoring wizard allowing "Next" before the map had loaded, which silently submitted lat/lon 0 and left the wizard stuck on the geo step with no error message. The button now stays disabled until both floor-plan and map anchors are ready, and failures surface as a toast notification.
+- Fixed walk-test heatmap crashing (black screen) when PCI or EARFCN was selected, caused by a fractional colour-palette index returning undefined during render.
+- Fixed the walk-test site-survey heatmap stacking on top of the eino walk-test view when switching between sub-modes in the validate tab.
+- Fixed cellular AP configuration losing edits to Mounting, Height, Pin-to-story, and above-roof fields on save — changes now persist correctly.
+- Fixed CBRS b48/n48 and C-Band rows in Project Settings rendering oversized channel selector controls; selectors are now correctly limited to ten visible controls per frequency row.
+- Fixed project copy failing silently for projects containing riser diagrams or HTML reports, which were stored in a different S3 bucket than the copy path expected — those reports are now included correctly in the duplicated project.
+- Fixed a server error when running heatmap calculations on a non-geolocated layout with no CRS string, which caused the indoor→outdoor hybrid heatmap path to crash instead of degrading gracefully.
+- Fixed walk-test `rssi_dbm` not being returned by the KPI GraphQL resolver.
+
+</Update>
+
+<Update label="2026-06-22">
+
 > DAS AI placement, WiFi manual channels, fade margin, riser diagram editor, and custom MCS tables ship alongside fixes for walk-test rendering, report wiring visibility, and cellular config round-tripping.
 
 ## New
